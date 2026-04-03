@@ -14,7 +14,14 @@ const jakarta = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "GarageNow | On-Demand Auto Garage Service",
   description: "Get real-time roadside assistance and mechanic services. Slippery smooth, lightning fast.",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover",
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: 0,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
