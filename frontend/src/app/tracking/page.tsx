@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { GoogleMap, useJsApiLoader, Marker, Polyline } from '@react-google-maps/api';
+import { useState, useEffect, Suspense } from 'react';
+import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSocket } from '@/context/SocketContext';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/axios';
-import { useParams, useRouter } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { Phone, MessageCircle, MapPin, Clock, ShieldCheck, Home, Zap } from 'lucide-react';
 import PaymentModal from '@/components/PaymentModal';
@@ -17,10 +17,11 @@ const mapContainerStyle = {
     height: '100vh',
 };
 
-export default function TrackingPage() {
-    const params = useParams();
+function TrackingContent() {
+    const searchParams = useSearchParams();
     const router = useRouter();
-    const { requestId } = params;
+    const requestId = searchParams.get('id');
+    
     const { socket, joinRoom } = useSocket();
     const { user } = useAuth();
 
@@ -37,13 +38,15 @@ export default function TrackingPage() {
     });
 
     useEffect(() => {
+        if (!requestId) return;
+
         const fetchRequest = async () => {
             try {
                 const { data } = await api.get(`/requests/${requestId}`);
                 if (data.success) {
                     setRequest(data.data);
                     setStatus(data.data.status);
-                    joinRoom(requestId as string);
+                    joinRoom(requestId);
                 }
             } catch (error) {
                 toast.error('Failed to load tracking data');
@@ -73,7 +76,16 @@ export default function TrackingPage() {
         };
     }, [socket, router]);
 
-    if (!isLoaded || !request) return <div className="h-screen flex items-center justify-center bg-dark text-white">Loading Tracker...</div>;
+    if (!requestId) {
+        return (
+            <div className="h-screen flex flex-col items-center justify-center bg-slate-950 text-white gap-4">
+                <h2 className="text-2xl font-black uppercase">No Request ID</h2>
+                <button onClick={() => router.push('/dashboard')} className="primary-button !py-2 !px-4">Return Home</button>
+            </div>
+        );
+    }
+
+    if (!isLoaded || !request) return <div className="h-screen flex items-center justify-center bg-slate-950 text-white font-black uppercase tracking-widest animate-pulse">Initializing Interface...</div>;
 
     const userPos = { lat: request.location.coordinates[1], lng: request.location.coordinates[0] };
 
@@ -88,17 +100,13 @@ export default function TrackingPage() {
                 options={{
                     disableDefaultUI: true,
                     styles: [
-                        /* Same dark styles as before for consistency */
                         { "elementType": "geometry", "stylers": [{ "color": "#121826" }] },
                         { "elementType": "labels.text.fill", "stylers": [{ "color": "#7a8a9e" }] },
                         { "featureType": "road", "elementType": "geometry", "stylers": [{ "color": "#1e293b" }] }
                     ]
                 }}
             >
-                {/* User Pin */}
                 <Marker position={userPos} icon={{ url: 'https://cdn-icons-png.flaticon.com/512/684/684908.png', scaledSize: new google.maps.Size(30, 30) }} />
-
-                {/* Mechanic Pin - showing real-time movement */}
                 {mechanicLocation && (
                     <Marker
                         position={mechanicLocation}
@@ -129,7 +137,6 @@ export default function TrackingPage() {
                 </motion.div>
             </div>
 
-            {/* Mechanic Profile Footer */}
             <motion.div
                 initial={{ y: 100 }}
                 animate={{ y: 0 }}
@@ -170,13 +177,9 @@ export default function TrackingPage() {
                     >
                         <Home size={16} className="mr-2" /> Back to Dashboard
                     </button>
-                    <button className="flex-1 cta-button !bg-rose-500/10 !text-rose-500 !border-rose-500/20 h-14 px-6 text-[10px] uppercase font-black tracking-widest hover:!bg-rose-500/20">
-                        Cancel Request
-                    </button>
                 </div>
             </motion.div>
 
-            {/* Modals */}
             <AnimatePresence>
                 {showPayment && (
                     <PaymentModal
@@ -199,5 +202,13 @@ export default function TrackingPage() {
                 )}
             </AnimatePresence>
         </div>
+    );
+}
+
+export default function TrackingPage() {
+    return (
+        <Suspense fallback={<div className="h-screen flex items-center justify-center bg-slate-950 text-white uppercase font-black tracking-[0.3em]">Synching with Satellite...</div>}>
+            <TrackingContent />
+        </Suspense>
     );
 }

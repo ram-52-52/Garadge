@@ -88,7 +88,7 @@ export default function UserDashboard() {
       try {
         const { data } = await api.get(`/requests/${currentRequestId}`);
         if (data.success && data.data.status !== 'pending') {
-          router.push(`/tracking/${currentRequestId}`);
+          router.push(`/tracking?id=${currentRequestId}`);
         }
       } catch (e) {
         console.error("Initial status check failed", e);
