@@ -1,0 +1,23 @@
+services:
+  # 🚀 Backend API Service
+  - type: web
+    name: garagenow-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - fromGroup: garagenow-secrets # Optional: Use environmental group for shared secrets
+
+  # 🎨 Frontend Web Service (Next.js)
+  - type: web
+    name: garagenow-frontend
+    runtime: node
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        value: https://garagenow-backend.onrender.com/api # Replace with your actual backend URL after first deploy

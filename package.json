@@ -1,0 +1,13 @@
+{
+  "name": "garagenow-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:fe": "cd frontend && npm install && npm run build",
+    "build:be": "cd backend && npm install",
+    "build": "npm run build:fe && npm run build:be"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}
