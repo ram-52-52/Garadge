@@ -138,6 +138,16 @@ exports.updateRequestStatus = async (req, res) => {
             runValidators: true
         });
 
+        // 💰 If request is completed, update mechanic stats
+        if (status === 'completed' && request.mechanic) {
+            await Mechanic.findByIdAndUpdate(request.mechanic, {
+                $inc: { 
+                    pricing: request.price || 850, // Default to 850 if price not set
+                    totalJobs: 1 
+                }
+            });
+        }
+
         // 📢 Emit socket event for status change
         const io = req.app.get('io');
         if (io) {

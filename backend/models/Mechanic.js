@@ -35,6 +35,10 @@ const mechanicSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    totalJobs: {
+        type: Number,
+        default: 0
+    },
     isOnline: {
         type: Boolean,
         default: false
