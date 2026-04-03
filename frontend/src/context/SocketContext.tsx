@@ -48,9 +48,9 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     };
 
     return (
-        <SocketContext.Provider value={{ socket, isConnected, joinRoom }}>
+        <SocketContext value={{ socket, isConnected, joinRoom }}>
             {children}
-        </SocketContext.Provider>
+        </SocketContext>
     );
 };
 
