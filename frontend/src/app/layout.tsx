@@ -19,9 +19,6 @@ export const metadata: Metadata = {
 export const viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -34,20 +31,8 @@ export default function RootLayout({
       <body className={`${jakarta.variable} font-sans bg-slate-900 text-slate-200 antialiased`}>
         <AuthProvider>
           <SocketProvider>
-            <Toaster 
-              position="top-center"
-              toastOptions={{
-                className: 'glass-card !text-white !rounded-3xl !py-4 !px-6',
-                style: {
-                  background: 'rgba(30, 41, 59, 0.7)',
-                  backdropFilter: 'blur(16px)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  color: '#f8fafc',
-                  boxShadow: '0 10px 30px -10px rgba(0, 0, 0, 0.5)',
-                },
-              }}
-            />
-            <div className="min-h-screen flex flex-col">
+            <Toaster position="top-right" />
+            <div className="min-h-screen flex flex-col relative z-0">
               {children}
             </div>
           </SocketProvider>
