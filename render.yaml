@@ -20,4 +20,6 @@ services:
     startCommand: npm run start
     envVars:
       - key: NEXT_PUBLIC_API_URL
-        value: https://garagenow-backend.onrender.com/api # Replace with your actual backend URL after first deploy
+        value: https://garadge-2-0.onrender.com/api
+      - key: NEXT_PUBLIC_SOCKET_URL
+        value: https://garadge-2-0.onrender.com
