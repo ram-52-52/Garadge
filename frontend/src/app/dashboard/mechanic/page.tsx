@@ -75,6 +75,7 @@ export default function MechanicDashboard() {
     // Tactical Vanguard Hooks
     const magneticOnline = useMagnetic(0.3);
     const magneticProfile = useMagnetic(0.4);
+    const magneticLogout = useMagnetic(0.2);
 
     // Performance-Optimized Mouse Tracker for 3D Tilt
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -312,6 +313,16 @@ export default function MechanicDashboard() {
                             >
                                 <div className={`w-2 h-2 rounded-full ${isOnline ? "bg-emerald-500 animate-pulse" : "bg-gray-400"}`} />
                                 <span className="hidden xl:block text-[10px] font-black uppercase tracking-widest">{isOnline ? "Connected" : "Offline"}</span>
+                            </button>
+                        </motion.div>
+
+                        <motion.div ref={magneticLogout.ref} animate={{ x: magneticLogout.x, y: magneticLogout.y }} onMouseLeave={magneticLogout.handleMouseLeave}>
+                            <button 
+                                onClick={logout}
+                                className="hidden md:flex items-center gap-3 px-6 py-3 rounded-2xl text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all duration-300 group"
+                            >
+                                <LogOut size={18} className="group-hover:translate-x-1 transition-transform" />
+                                <span className="hidden xl:block text-[10px] font-black uppercase tracking-widest">Logout</span>
                             </button>
                         </motion.div>
 

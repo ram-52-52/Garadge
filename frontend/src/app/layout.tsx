@@ -29,7 +29,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${jakarta.variable} font-sans min-h-screen w-full flex flex-col bg-[#F8F9FA] text-slate-900 selection:bg-yellow-200 antialiased`}>
+      <body 
+        className={`${jakarta.variable} font-sans min-h-screen w-full flex flex-col bg-[#F8F9FA] text-slate-900 selection:bg-yellow-200 antialiased`}
+        suppressHydrationWarning
+      >
         <AuthProvider>
           <SocketProvider>
             <Toaster position="top-right" />
