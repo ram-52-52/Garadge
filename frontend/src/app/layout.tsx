@@ -16,9 +16,10 @@ export const metadata: Metadata = {
   description: "Get real-time roadside assistance and mechanic services. Slippery smooth, lightning fast.",
 };
 
-export const viewport = {
-  width: "device-width",
-  initialScale: 1,
+export const viewport = { 
+  width: 'device-width', 
+  initialScale: 1, 
+  maximumScale: 1 
 };
 
 export default function RootLayout({
@@ -27,12 +28,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
-      <body className={`${jakarta.variable} font-sans bg-slate-900 text-slate-200 antialiased`}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${jakarta.variable} font-sans bg-background text-text-primary antialiased min-h-screen flex flex-col`}>
         <AuthProvider>
           <SocketProvider>
             <Toaster position="top-right" />
-            <div className="min-h-screen flex flex-col relative z-0">
+            <div className="flex-grow flex flex-col relative z-0 min-h-screen">
               {children}
             </div>
           </SocketProvider>

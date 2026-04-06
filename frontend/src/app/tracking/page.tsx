@@ -8,7 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/axios';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
-import { Phone, MessageCircle, MapPin, Clock, ShieldCheck, Home, Zap } from 'lucide-react';
+import { Phone, MessageCircle, MapPin, Clock, ShieldCheck, Home, Zap, Star } from 'lucide-react';
 import PaymentModal from '@/components/PaymentModal';
 import ReviewModal from '@/components/ReviewModal';
 
@@ -16,6 +16,18 @@ const mapContainerStyle = {
     width: '100%',
     height: '100vh',
 };
+
+const sunlightMapStyles = [
+    { "elementType": "geometry", "stylers": [{ "color": "#f5f5f5" }] },
+    { "elementType": "labels.icon", "stylers": [{ "visibility": "off" }] },
+    { "elementType": "labels.text.fill", "stylers": [{ "color": "#616161" }] },
+    { "elementType": "labels.text.stroke", "stylers": [{ "color": "#f5f5f5" }] },
+    { "featureType": "administrative.land_parcel", "elementType": "labels.text.fill", "stylers": [{ "color": "#bdbdbd" }] },
+    { "featureType": "poi", "elementType": "geometry", "stylers": [{ "color": "#eeeeee" }] },
+    { "featureType": "poi.park", "elementType": "geometry", "stylers": [{ "color": "#e5e5e5" }] },
+    { "featureType": "road", "elementType": "geometry", "stylers": [{ "color": "#ffffff" }] },
+    { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#c9c9c9" }] }
+];
 
 function TrackingContent() {
     const searchParams = useSearchParams();
@@ -74,109 +86,119 @@ function TrackingContent() {
             socket.off('location-update');
             socket.off('status-changed');
         };
-    }, [socket, router]);
+    }, [socket]);
 
     if (!requestId) {
         return (
-            <div className="h-screen flex flex-col items-center justify-center bg-slate-950 text-white gap-4">
-                <h2 className="text-2xl font-black uppercase">No Request ID</h2>
-                <button onClick={() => router.push('/dashboard')} className="primary-button !py-2 !px-4">Return Home</button>
+            <div className="min-h-screen flex flex-col items-center justify-center bg-background text-gray-900 gap-6 noise-bg">
+                <div className="w-20 h-20 bg-zinc-900 rounded-[2.5rem] flex items-center justify-center shadow-2xl mb-4">
+                    <MapPin size={40} className="text-primary fill-primary" />
+                </div>
+                <h2 className="text-4xl font-black uppercase tracking-tighter">Null Coordinates</h2>
+                <button onClick={() => router.push('/dashboard')} className="cta-button h-16 px-10 text-[10px] uppercase tracking-widest shadow-xl">Return to Hub</button>
             </div>
         );
     }
 
-    if (!isLoaded || !request) return <div className="h-screen flex items-center justify-center bg-slate-950 text-white font-black uppercase tracking-widest animate-pulse">Initializing Interface...</div>;
+    if (!isLoaded || !request) return <div className="min-h-screen flex items-center justify-center bg-background text-gray-400 font-black uppercase tracking-[0.4em] animate-pulse noise-bg">Synchronizing Pulse...</div>;
 
     const userPos = { lat: request.location.coordinates[1], lng: request.location.coordinates[0] };
 
     return (
-        <div className="relative h-screen overflow-hidden">
-            {/* Map */}
+        <div className="relative min-h-screen bg-background">
             <GoogleMap
                 mapContainerStyle={mapContainerStyle}
                 center={mechanicLocation || userPos}
-                zoom={15}
+                zoom={14}
                 onLoad={setMap}
                 options={{
                     disableDefaultUI: true,
-                    styles: [
-                        { "elementType": "geometry", "stylers": [{ "color": "#121826" }] },
-                        { "elementType": "labels.text.fill", "stylers": [{ "color": "#7a8a9e" }] },
-                        { "featureType": "road", "elementType": "geometry", "stylers": [{ "color": "#1e293b" }] }
-                    ]
+                    styles: sunlightMapStyles
                 }}
             >
-                <Marker position={userPos} icon={{ url: 'https://cdn-icons-png.flaticon.com/512/684/684908.png', scaledSize: new google.maps.Size(30, 30) }} />
+                <Marker position={userPos} icon={{ url: 'https://cdn-icons-png.flaticon.com/512/684/684908.png', scaledSize: new google.maps.Size(40, 40) }} />
                 {mechanicLocation && (
                     <Marker
                         position={mechanicLocation}
-                        icon={{ url: 'https://cdn-icons-png.flaticon.com/512/3063/3063822.png', scaledSize: new google.maps.Size(40, 40) }}
+                        icon={{ url: 'https://cdn-icons-png.flaticon.com/512/3063/3063822.png', scaledSize: new google.maps.Size(50, 50) }}
                     />
                 )}
             </GoogleMap>
 
-            {/* Tracking Overlay */}
-            <div className="absolute top-6 left-6 right-6 z-10 flex flex-col gap-4">
+            <div className="absolute top-8 left-8 right-8 z-10">
                 <motion.div
                     initial={{ y: -50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    className="glass-card p-4 rounded-2xl flex items-center justify-between backdrop-blur-xl border border-white/5 shadow-2xl"
+                    className="max-w-[800px] mx-auto bg-white/70 backdrop-blur-3xl p-6 rounded-[2.5rem] flex items-center justify-between border border-white/60 shadow-premium relative overflow-hidden"
                 >
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center text-emerald-400">
-                            <ShieldCheck size={20} />
+                    <div className="tactical-bracket bracket-tl scale-75" />
+                    <div className="tactical-bracket bracket-tr scale-75" />
+                    
+                    <div className="flex items-center gap-5">
+                        <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500 shadow-inner">
+                            <ShieldCheck size={28} />
                         </div>
                         <div>
-                            <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">Live Status</p>
-                            <h3 className="text-white font-bold text-label-md uppercase tracking-tighter shrink-0 truncate">Mechanic is {status.replace('-', ' ')}</h3>
+                            <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.4em] mb-1">Live Deployment Protocol</p>
+                            <h3 className="text-gray-900 font-black text-2xl uppercase tracking-tighter shrink-0 truncate">Responder is {status.replace('-', ' ')}</h3>
                         </div>
-                    </div>
-                    <div className="bg-emerald-500/10 px-3 py-1.5 rounded-full text-[10px] font-black text-emerald-400 flex items-center gap-1.5 uppercase tracking-widest border border-emerald-500/20">
-                        <Clock size={12} /> 8-12m
                     </div>
                 </motion.div>
             </div>
 
             <motion.div
-                initial={{ y: 100 }}
-                animate={{ y: 0 }}
-                className="absolute bottom-6 left-6 right-6 z-20 glass-card p-6 md:p-8 rounded-[40px] border border-white/10 backdrop-blur-2xl bg-black/40 shadow-[0_-20px_50px_rgba(0,0,0,0.5)]"
+                initial={{ y: 100, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                className="absolute bottom-8 left-8 right-8 z-20 max-w-[1200px] mx-auto bg-white/80 backdrop-blur-3xl p-8 rounded-[4rem] border border-white/60 shadow-premium relative overflow-hidden"
             >
-                <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-6 border-b border-white/5 mb-6">
-                    <div className="flex items-center gap-5 w-full md:w-auto">
-                        <div className="w-16 h-16 bg-primary/20 rounded-3xl flex items-center justify-center text-primary border border-primary/20 shrink-0 shadow-indigo-glow">
-                            <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${request.mechanic?.name || 'mechanic'}`} alt="avatar" className="w-12 h-12 rounded-2xl" />
+                <div className="absolute -right-20 -bottom-20 opacity-[0.03] select-none pointer-events-none">
+                     <h1 className="text-[15rem] font-black -rotate-12 tracking-tighter">GNOW</h1>
+                </div>
+
+                <div className="flex flex-col md:flex-row items-center justify-between gap-8 pb-10 border-b border-gray-100 mb-8 relative z-10">
+                    <div className="flex items-center gap-6 w-full md:w-auto">
+                        <div className="relative">
+                            <div className="w-20 h-20 bg-primary/20 rounded-[2.5rem] flex items-center justify-center text-primary border border-primary/20 shrink-0 shadow-lg p-1 overflow-hidden">
+                                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${request.mechanic?.name || 'mechanic'}`} alt="avatar" className="w-full h-full rounded-[2rem] object-cover" />
+                            </div>
+                            <div className="absolute -bottom-1 -right-1 bg-emerald-500 w-6 h-6 rounded-full border-4 border-white flex items-center justify-center text-white">
+                                <ShieldCheck size={10} strokeWidth={4} />
+                            </div>
                         </div>
                         <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                                <h4 className="text-white font-black text-h2 uppercase tracking-tighter leading-none">{request.mechanic?.name || 'Your Mechanic'}</h4>
-                                <span className="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-md font-black uppercase tracking-widest">Verified</span>
+                            <div className="flex items-center gap-3 mb-2">
+                                <h4 className="text-gray-900 font-black text-4xl uppercase tracking-tighter leading-none shrink-0">{request.mechanic?.name || 'Assigned Expert'}</h4>
                             </div>
-                            <p className="text-slate-400 text-[10px] font-bold flex items-center gap-2 uppercase tracking-[0.2em]">
-                                <span className="text-emerald-500 font-extrabold flex items-center gap-1"><Zap size={12} fill="currentColor" /> 4.9</span>
-                                <span className="w-1.5 h-1.5 bg-slate-800 rounded-full" />
-                                <span>Expertise: {Array.isArray(request.issueType) ? request.issueType.join(', ') : request.issueType}</span>
-                            </p>
+                            <div className="flex flex-wrap items-center gap-3">
+                                <div className="flex items-center gap-1.5 bg-yellow-400 text-black px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm">
+                                    <Star size={12} fill="currentColor" /> 4.9
+                                </div>
+                                <span className="w-1.5 h-1.5 bg-gray-200 rounded-full" />
+                                <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em]">Expertise: {Array.isArray(request.issueType) ? request.issueType.join(' + ') : request.issueType}</p>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="flex gap-2 w-full md:w-auto">
-                        <button className="flex-1 md:w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-white/10 transition-all group">
-                            <MessageCircle size={20} className="group-hover:scale-110 transition-transform" />
+                    <div className="flex gap-4 w-full md:w-auto">
+                        <button className="flex-1 md:w-20 h-20 rounded-[2rem] bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 hover:bg-zinc-900 hover:text-white transition-all duration-500 group shadow-sm">
+                            <MessageCircle size={28} className="group-hover:scale-110 transition-transform duration-500" />
                         </button>
-                        <button className="flex-1 md:w-14 h-14 rounded-2xl bg-emerald-500 flex items-center justify-center text-white hover:bg-emerald-600 transition-all shadow-luxurious group">
-                            <Phone size={20} className="group-hover:scale-110 transition-transform" />
+                        <button className="flex-1 md:w-20 h-20 rounded-[2rem] bg-zinc-900 flex items-center justify-center text-primary hover:bg-primary hover:text-black transition-all duration-500 shadow-2xl group">
+                            <Phone size={28} className="group-hover:scale-110 transition-transform duration-500 fill-current" />
                         </button>
                     </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row gap-3">
-                    <button
-                        onClick={() => router.push('/dashboard')}
-                        className="flex-1 cta-button !bg-white/5 !text-slate-400 !border-white/5 h-14 px-6 text-[10px] uppercase font-black tracking-widest hover:!bg-white/10"
-                    >
-                        <Home size={16} className="mr-2" /> Back to Dashboard
-                    </button>
+                <div className="flex flex-col md:flex-row gap-4 relative z-10">
+                    <div className="flex-1 bg-gray-50/50 p-6 rounded-[2.5rem] border border-gray-100 flex items-center justify-between">
+                         <div className="flex items-center gap-4">
+                             <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-gray-400 shadow-sm"><MapPin size={24} /></div>
+                             <div>
+                                 <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Target Address</p>
+                                 <p className="text-xs font-bold text-gray-900 uppercase truncate max-w-[200px] md:max-w-md">{request.address}</p>
+                             </div>
+                         </div>
+                    </div>
                 </div>
             </motion.div>
 
@@ -207,7 +229,7 @@ function TrackingContent() {
 
 export default function TrackingPage() {
     return (
-        <Suspense fallback={<div className="h-screen flex items-center justify-center bg-slate-950 text-white uppercase font-black tracking-[0.3em]">Synching with Satellite...</div>}>
+        <Suspense fallback={<div className="h-screen flex items-center justify-center bg-background text-gray-900 uppercase font-black tracking-[0.4em] noise-bg animate-pulse">Establishing Uplink Hub...</div>}>
             <TrackingContent />
         </Suspense>
     );

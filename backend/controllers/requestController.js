@@ -10,9 +10,19 @@ exports.createRequest = async (req, res) => {
 
         // 🛠️ Normalize data for the new schema
         const normalizedVehicle = (vehicleType === '2-wheel' || vehicleType === '2-WHEELER') ? '2-WHEELER' : '4-WHEELER';
+        
+        const mapIssue = (issue) => {
+            const s = issue.toUpperCase();
+            if (s.includes('PUNCTURE') || s.includes('FLAT') || s.includes('TYRE')) return 'PUNCTURE';
+            if (s.includes('BATTERY')) return 'BATTERY';
+            if (s.includes('FUEL')) return 'FUEL';
+            if (s.includes('ENGINE')) return 'ENGINE';
+            return 'GENERAL'; // Default fallback
+        };
+
         const normalizedIssues = Array.isArray(issueType) 
-            ? issueType.map(i => i.toUpperCase().split(' ')[0]) // Take first word to avoid "GENERAL SERVICE" mismatch
-            : [issueType.toUpperCase().split(' ')[0]];
+            ? issueType.map(mapIssue)
+            : [mapIssue(issueType || 'GENERAL')];
 
         // Ensure location is formatted correctly for GeoJSON: [longitude, latitude]
         const coordinates = location ? [location.lng, location.lat] : [72.5714, 23.0225];
@@ -56,6 +66,27 @@ exports.createRequest = async (req, res) => {
                     expertise: 1,
                     vehicleTypes: 1,
                     distance: 1,
+                    matchedSkills: {
+                        $filter: {
+                            input: "$expertise",
+                            as: "skill",
+                            cond: { $in: ["$$skill", normalizedIssues] }
+                        }
+                    },
+                    isFullMatch: {
+                        $eq: [
+                            {
+                                $size: {
+                                    $filter: {
+                                        input: "$expertise",
+                                        as: "skill",
+                                        cond: { $in: ["$$skill", normalizedIssues] }
+                                    }
+                                }
+                            },
+                            normalizedIssues.length
+                        ]
+                    },
                     distanceStr: {
                         $cond: {
                             if: { $lt: ["$distance", 1000] },
@@ -75,15 +106,27 @@ exports.createRequest = async (req, res) => {
         res.status(201).json({
             success: true,
             data: request,
-            nearbyMechanics: mechanics
+            nearbyMechanics: mechanics,
+            noMatchesFound: mechanics.length === 0
         });
 
-        // 📢 Emit socket event AFTER response so user has time to join room
+        // 📢 Targeted Broadcasting Protocol
         const io = req.app.get('io');
         if (io) {
-            io.emit('request-received', {
-                request,
-                nearbyMechanics: mechanics
+            // 🚨 CRITICAL FIX: Only emit to mechanics who matched the criteria
+            mechanics.forEach(mech => {
+                io.to(mech._id.toString()).emit('request-received', {
+                    request,
+                    distance: mech.distanceStr,
+                    matchedSkills: mech.matchedSkills,
+                    isFullMatch: mech.isFullMatch
+                });
+            });
+            
+            // Also notify the user's room about the dispatch status
+            io.to(request._id.toString()).emit('dispatch-status', {
+                status: mechanics.length > 0 ? 'searching' : 'no-specialists',
+                count: mechanics.length
             });
         }
     } catch (error) {
@@ -100,12 +143,23 @@ exports.getRequests = async (req, res) => {
         if (req.user.role === 'customer') {
             query = Request.find({ user: req.user._id });
         } else if (req.user.role === 'mechanic') {
-            query = Request.find({ status: 'pending' }); // Mechanics see pending requests in radius usually, but for now all pending
+            // 🛠️ Elite Filtering for Mechanic Feed Hub
+            // Only show pending requests that match the mechanic's expertise and vehicle type
+            query = Request.find({ 
+                $or: [
+                    { 
+                        status: 'pending',
+                        vehicleType: { $in: req.user.vehicleTypes },
+                        issueType: { $in: req.user.expertise }
+                    },
+                    { mechanic: req.user._id }
+                ]
+            });
         } else {
             query = Request.find();
         }
 
-        const requests = await query.populate('user', 'name email').populate('mechanic', 'name email');
+        const requests = await query.populate('user', 'name email').populate('mechanic', 'name email').sort({ createdAt: -1 });
         res.status(200).json({ success: true, count: requests.length, data: requests });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });

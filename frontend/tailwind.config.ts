@@ -15,14 +15,8 @@ const config: Config = {
         background: "var(--background)",
         foreground: "var(--foreground)",
         primary: {
-          DEFAULT: "var(--primary)",
-          dark: "var(--primary-dark)",
-        },
-        slate: {
-          950: "#020617",
-          900: "#0f172a",
-          800: "#1e293b",
-          700: "#334155",
+          DEFAULT: "#FACC15", // Yellow-400
+          dark: "#EAB308", // Yellow-500
         },
         zinc: {
           950: "#09090b",
@@ -31,12 +25,14 @@ const config: Config = {
         }
       },
       boxShadow: {
-        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.4)',
-        'indigo': '0 10px 30px -10px rgba(99, 102, 241, 0.3)',
+        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.05)',
+        'premium-light': '0 10px 40px -10px rgba(0, 0, 0, 0.04)',
+        'yellow-glow': '0 0 30px rgba(250, 204, 21, 0.2)',
       },
       borderRadius: {
         '3xl': '1.5rem',
         '4xl': '2rem',
+        '5xl': '3rem',
       },
     },
   },

@@ -15,11 +15,11 @@ const initSocket = (server) => {
 
         /**
          * @section Join Room
-         * Rooms are based on Request ID for private updates
+         * Rooms are based on User/Request ID for private updates
          */
-        socket.on('join-room', (requestId) => {
-            socket.join(requestId);
-            console.log(`🏠 Client ${socket.id} joined room: ${requestId}`);
+        socket.on('join-room', (roomId) => {
+            socket.join(roomId);
+            console.log(`🏠 Client ${socket.id} joined room: ${roomId}`);
         });
 
         /**
