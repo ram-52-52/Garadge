@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import api from '@/lib/axios';
 
 interface User {
@@ -38,6 +38,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [token, setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
+    const pathname = usePathname();
 
     useEffect(() => {
         const storedToken = localStorage.getItem('token');
@@ -155,6 +156,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         document.cookie = "userRole=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC";
         router.push('/login');
     };
+
+    // 🛡️ Client-Side Route Protection (Static-Safe)
+    useEffect(() => {
+        if (loading) return;
+
+        const pathname = window.location.pathname;
+
+        // Admin Route Protection
+        if (pathname.startsWith('/dashboard/admin')) {
+            if (!token || user?.role !== 'admin') {
+                router.push('/login');
+            }
+        } 
+        // General Dashboard Protection
+        else if (pathname.startsWith('/dashboard')) {
+            if (!token) {
+                router.push('/login');
+            }
+        }
+    }, [pathname, token, user, loading, router]);
 
     return (
         <AuthContext value={{ user, token, loading, login, register, updateProfile, logout }}>
