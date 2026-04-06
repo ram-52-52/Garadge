@@ -29,13 +29,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${jakarta.variable} font-sans bg-background text-text-primary antialiased min-h-screen flex flex-col`}>
+      <body className={`${jakarta.variable} font-sans min-h-screen w-full flex flex-col bg-[#F8F9FA] text-slate-900 selection:bg-yellow-200 antialiased`}>
         <AuthProvider>
           <SocketProvider>
             <Toaster position="top-right" />
-            <div className="flex-grow flex flex-col relative z-0 min-h-screen">
+            <main className="flex-grow w-full relative z-0">
               {children}
-            </div>
+            </main>
           </SocketProvider>
         </AuthProvider>
       </body>
