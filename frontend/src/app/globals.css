@@ -202,16 +202,21 @@
   scroll-behavior: smooth;
 }
 
-html, body {
+/* Scroll Root Fixes - Ensuring natural document flow 🌊 */
+html {
   min-height: 100vh;
-  overflow-x: hidden;
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px; /* Offset for floating headers */
 }
 
 body {
+  min-height: 100vh;
+  overflow-x: hidden; /* Only hide horizontal overflow on body */
   overflow-y: auto !important;
   display: flex;
   flex-direction: column;
   -webkit-overflow-scrolling: touch;
+  background-color: var(--color-background);
 }
 
 /* Custom Scrollbar */

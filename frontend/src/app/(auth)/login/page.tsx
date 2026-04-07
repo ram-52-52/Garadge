@@ -33,7 +33,7 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-background flex items-start justify-center px-4 py-8 sm:p-6 sm:items-center relative font-sans noise-bg antialiased vanguard-grid">
+        <div className="min-h-[100dvh] bg-background flex items-start justify-center px-4 py-12 sm:p-6 sm:items-center relative font-sans noise-bg antialiased vanguard-grid overflow-y-auto">
             {/* Tactical Atmosphere Layer */}
             <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
                 <motion.div animate={{ x: [0, 100, 0], y: [0, -50, 0] }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }} className="neo-orb w-[600px] h-[600px] bg-primary/20 -top-40 -left-40" />
