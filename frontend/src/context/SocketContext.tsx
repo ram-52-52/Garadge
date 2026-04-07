@@ -20,7 +20,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     useEffect(() => {
         if (!token) return;
 
-        const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000', {
+        const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'https://garadge-2-0.onrender.com', {
             auth: { token }
         });
 
